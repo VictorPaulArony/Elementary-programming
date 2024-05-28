@@ -1,0 +1,3 @@
+module ispowerof2
+
+go 1.22.1
