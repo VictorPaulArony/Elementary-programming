@@ -1,29 +1,31 @@
 package main
 
 import (
-	"fmt"
-	//"os"
-	//"github.com/01-edu/z01"
+	"os"
+
+	"github.com/01-edu/z01"
 )
 
+//"os"
+//"github.com/01-edu/z01"
+
 func main() {
-	str := "    FOR GOPHERS res     "
-	// last := len(str)-1
-	// fmt.Println(last)
-	var s []string
-	sj := ""
-	for _, char := range str {
-		if char == ' ' && len(sj) != 0 {
-			s = append(s, sj)
-			sj = ""
-			continue
-		} else if char != ' ' {
-			sj += string(char)
+	if len(os.Args) > 2 {
+		os.Exit(0)
+	}
+	data := os.Args[1]
+	res := ""
+	for i := len(data) - 1; i >= 0; i-- {
+		if data[i] != ' ' {
+			res = string(data[i]) + res
+		} else if data[i] == ' ' && res != "" {
+			break
 		}
 	}
-	if len(sj) != 0 {
-		s = append(s, sj)
+	if res != "" {
+		for _, char := range res {
+			z01.PrintRune(char)
+		}
+		z01.PrintRune('\n')
 	}
-	fmt.Println(s[len(s)-1])
-	println(len(s))
 }
