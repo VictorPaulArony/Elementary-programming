@@ -10,6 +10,14 @@ func main() {
 			z01.PrintRune(a)
 		}
 	}
+	z01.PrintRune('\n')
+	for a := 'z'; a >= 'a'; a-- {
+		if a%2 == 0 {
+			z01.PrintRune(a - ('a' - 'A'))
+		} else {
+			z01.PrintRune(a)
+		}
+	}
 
 	z01.PrintRune('\n')
 }
