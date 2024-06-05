@@ -16,13 +16,7 @@ func main() {
 func Check(str1, str2 string) string {
 	res := ""
 	count := make(map[rune]bool)
-	for _, val := range str1 {
-		if !count[val] {
-			count[val] = true
-			res += string(val)
-		}
-	}
-	for _, val := range str2 {
+	for _, val := range str1 + str2 {
 		if !count[val] {
 			count[val] = true
 			res += string(val)
