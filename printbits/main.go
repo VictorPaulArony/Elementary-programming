@@ -27,7 +27,9 @@ func Atoi(str string) int {
 	bin := 0
 	for res > 0 {
 		digit := res % 2
-
+		/*bin = bin*10 + digit: Accumulate the binary result. Here,
+		bin is multiplied by 10 to shift the current binary digits to the left
+		 (i.e., move them one place to the left), and the new digit is added*/
 		bin = bin*10 + digit
 
 		res /= 2
