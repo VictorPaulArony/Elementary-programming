@@ -11,7 +11,7 @@ func main() {
 	}
 
 	data := os.Args[1]
-	num := convert(data)
+	num := Atoi(data)
 	// The main function checks if the number is positive and a power of 2 using the bitwise operation
 	for num != 1 {
 		if num%2 != 0 {
