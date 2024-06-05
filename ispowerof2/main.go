@@ -24,7 +24,7 @@ func main() {
 	fmt.Println("true")
 }
 
-func convert(str string) int {
+func Atoi(str string) int {
 	var res int
 	for _, s := range str {
 		res = res*10 + int(s-'0')
