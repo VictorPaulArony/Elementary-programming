@@ -10,6 +10,7 @@ func main() {
 	}
 	data := os.Args[1]
 	atoi := Atoi(data)
+
 	os.Stdout.WriteString(Itoa(atoi) + "\n")
 }
 
@@ -18,7 +19,16 @@ func Atoi(str string) int {
 	for _, num := range str {
 		res = res*10 + int(num-'0')
 	}
-	return res
+	bin := 0
+	for res > 0 {
+		digit := res % 2
+
+		bin = bin*10 + digit
+
+		res /= 2
+	}
+
+	return bin
 }
 
 func Itoa(num int) string {
@@ -29,6 +39,7 @@ func Itoa(num int) string {
 		num /= 10
 
 	}
+
 	return res
 }
 
