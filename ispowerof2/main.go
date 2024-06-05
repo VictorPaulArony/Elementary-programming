@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 )
 
@@ -15,17 +14,18 @@ func main() {
 	// The main function checks if the number is positive and a power of 2 using the bitwise operation
 	for num != 1 {
 		if num%2 != 0 {
-			fmt.Println("false")
+			os.Stdout.WriteString("false" + "\n")
 			return
 		}
 		num /= 2
 
 	}
-	fmt.Println("true")
+	
+	os.Stdout.WriteString("true" + "\n")
 }
 
 func Atoi(str string) int {
-	var res int
+	res := 0
 	for _, s := range str {
 		res = res*10 + int(s-'0')
 	}
