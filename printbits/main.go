@@ -4,6 +4,7 @@ import (
 	"os"
 )
 
+// func main for data reading and writing
 func main() {
 	if len(os.Args) != 2 {
 		return
@@ -17,6 +18,7 @@ func main() {
 	os.Stdout.WriteString(out + "\n")
 }
 
+// func Atoi converts string to int
 func Atoi(str string) int {
 	res := 0
 	for _, num := range str {
@@ -34,6 +36,7 @@ func Atoi(str string) int {
 	return bin
 }
 
+// func Itoa converts int to string
 func Itoa(num int) string {
 	var res string
 	for num > 0 {
