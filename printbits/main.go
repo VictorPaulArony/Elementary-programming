@@ -10,8 +10,11 @@ func main() {
 	}
 	data := os.Args[1]
 	atoi := Atoi(data)
-
-	os.Stdout.WriteString(Itoa(atoi) + "\n")
+	out := Itoa(atoi)
+	for len(out) < 8 {
+		out = out + "0"
+	}
+	os.Stdout.WriteString(out + "\n")
 }
 
 func Atoi(str string) int {
