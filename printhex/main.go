@@ -5,6 +5,7 @@ import (
 	"os"
 )
 
+// the main function for data output
 func main() {
 	if len(os.Args) < 1 {
 		return
@@ -14,10 +15,11 @@ func main() {
 		fmt.Println("ERROR")
 		return
 	}
-	fmt.Println(Check(Atoi(data)))
+	fmt.Println(Hex(Atoi(data)))
 }
 
-func Check(num int) string {
+// func Hex converts the int to a significant hex-decimal value
+func Hex(num int) string {
 	var res string
 	dec := "0123456789abcdef"
 	for num > 0 {
@@ -28,6 +30,7 @@ func Check(num int) string {
 	return res
 }
 
+// func Atoi convert string to int
 func Atoi(str string) int {
 	res := 0
 	for _, val := range str {
@@ -36,8 +39,9 @@ func Atoi(str string) int {
 	return res
 }
 
+// func Valid check if the argument is a digit 0-9
 func Vaild(str string) bool {
-	if str == ""{
+	if str == "" {
 		return false
 	}
 	for _, s := range str {
