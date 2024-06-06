@@ -5,6 +5,9 @@ import (
 )
 
 func main() {
+	if len(os.Args) > 3 {
+		return
+	}
 	data := os.Args[1]
 	s := os.Args[2]
 	r := os.Args[3]
