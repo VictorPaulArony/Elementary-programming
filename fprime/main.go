@@ -27,7 +27,7 @@ func Itoa(num int) string {
 	res := ""
 	for num > 0 {
 		n := num % 10
-		dig := string(int(n + '0'))
+		dig := string(rune(n + '0'))
 		res = dig + res
 		num /= 10
 	}
@@ -38,7 +38,7 @@ func Itoa(num int) string {
 func Star(slc []int) string {
 	var res string
 	for _, val := range slc {
-		res = res + Itoa(val) + "*" 
+		res = res + Itoa(val) + "*"
 	}
 	return res[:len(res)-1]
 }
@@ -58,7 +58,7 @@ func IsPrime(num int) bool {
 func Prime(num int) []int {
 	var res []int
 	for i := 2; i <= num; i++ {
-		for IsPrime(i) && num% i == 0 {
+		for IsPrime(i) && num%i == 0 {
 			res = append(res, i)
 			num /= i
 
