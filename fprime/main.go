@@ -11,7 +11,7 @@ func main() {
 	data := os.Args[1]
 	atoi := Atoi(data)
 	next := Prime(atoi)
-	out := Itoa(next)
+	out := Star(next)
 	os.Stdout.WriteString(out + "\n")
 }
 
@@ -35,6 +35,14 @@ func Itoa(num int) string {
 	return res
 }
 
+func Star(slc []int) string {
+	var res string
+	for _, val := range slc {
+		res = res + Itoa(val) + "*" 
+	}
+	return res[:len(res)-1]
+}
+
 func IsPrime(num int) bool {
 	if num <= 1 {
 		return false
@@ -50,7 +58,7 @@ func IsPrime(num int) bool {
 func Prime(num int) []int {
 	var res []int
 	for i := 2; i <= num; i++ {
-		if (IsPrime(i)) && num%i == 0 {
+		for IsPrime(i) && num% i == 0 {
 			res = append(res, i)
 			num /= i
 
