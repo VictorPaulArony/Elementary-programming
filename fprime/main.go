@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 )
-
+// Ensure exactly one command-line argument is provided
 func main() {
 	if len(os.Args) < 2 {
 		return
@@ -14,7 +14,7 @@ func main() {
 	out := Star(next)
 	os.Stdout.WriteString(out + "\n")
 }
-
+// Atoi ,converting string to int
 func Atoi(str string) int {
 	res := 0
 	for _, char := range str {
@@ -22,7 +22,7 @@ func Atoi(str string) int {
 	}
 	return res
 }
-
+//Itoa converts int to string 
 func Itoa(num int) string {
 	res := ""
 	for num > 0 {
@@ -42,7 +42,7 @@ func Star(slc []int) string {
 	}
 	return res[:len(res)-1]
 }
-
+//IsPrime check if the int is a prime number 
 func IsPrime(num int) bool {
 	if num <= 1 {
 		return false
@@ -54,7 +54,7 @@ func IsPrime(num int) bool {
 	}
 	return true
 }
-
+// Prime get the list of all factorial prime numbers of a given number 
 func Prime(num int) []int {
 	var res []int
 	for i := 2; i <= num; i++ {
