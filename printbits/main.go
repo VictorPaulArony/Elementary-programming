@@ -43,7 +43,7 @@ func Itoa(num int) string {
 	var res string
 	for num > 0 {
 		n := num % 10
-		res = string(n+'0') + res
+		res = string(rune(n+'0') )+ res
 		num /= 10
 
 	}
