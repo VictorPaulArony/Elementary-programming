@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family:'Times New Roman', Times, serif;
+            background-color: #f6f7fa;
+        }
+        .login-container {
+            text-align: center;
+            background-color: #c4dbeb;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .login-container h2 {
+            color: brown;
+            margin-bottom: 20px;
+        }
+        .login-container div {
+            margin-bottom: 15px;
+        }
+        .login-container label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .login-container input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .login-container button {
+            padding: 10px 20px;
+            background-color: brown;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .login-container button:hover {
+            background-color: #0952a7;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login Page</h2>
+        <form action="/login" method="POST">
+            <div>
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div>
+                <button type="submit">Login</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
