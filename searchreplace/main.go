@@ -2,23 +2,19 @@ package main
 
 import (
 	"os"
+	"strings"
 )
 
 func main() {
-	if len(os.Args) > 3 {
+	if len(os.Args) != 4 {
 		return
 	}
 	data := os.Args[1]
 	s := os.Args[2]
 	r := os.Args[3]
-	res := ""
-	for _, val := range data {
-		if string(val) == s {
-			res += r
-		} else {
-			res += string(val)
-		}
-	}
+	// Replace the first occurrence of s with r in data
+	res := strings.Replace(data, s, r, -1)
+
 	os.Stdout.WriteString(res + "\n")
 }
 
