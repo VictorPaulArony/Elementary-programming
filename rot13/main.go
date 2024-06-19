@@ -2,8 +2,6 @@ package main
 
 import (
 	"os"
-
-	"github.com/01-edu/z01"
 )
 
 func main() {
@@ -11,26 +9,23 @@ func main() {
 		os.Exit(0)
 	}
 	data := os.Args[1]
-
-	var res string
-	for _, d := range data {
-		res += string(Check(d))
-		continue
+	res := ""
+	for _, v := range data {
+		res += Check(v)
 	}
-	for _, val := range res {
-		z01.PrintRune(val)
-	}
-	z01.PrintRune('\n')
+	os.Stdout.WriteString(res + "\n")
 }
 
-func Check(r rune) rune {
+func Check(r rune) string {
+	res := ""
 	if r >= 'a' && r <= 'z' {
-		return 'a' + (r-'a'+13)%26
+		res = string((r-'a'+13)%26 + 'a')
+	} else if r >= 'A' && r <= 'Z' {
+		res = string((r-'A'+13)%26 + 'A')
+	} else {
+		res = string(r)
 	}
-	if r >= 'A' && r <= 'Z' {
-		return (r-'A'+13)%26 + 'A'
-	}
-	return r
+	return res
 }
 
 // Expected
