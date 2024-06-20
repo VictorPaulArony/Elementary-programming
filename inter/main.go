@@ -5,25 +5,28 @@ import (
 )
 
 func main() {
-	if len(os.Args) < 2 {
+	if len(os.Args) != 3 {
 		return
 	}
-	data1 := os.Args[1]
-	data2 := os.Args[2]
-	os.Stdout.WriteString(Inter(data1, data2) + "\n")
+	d1 := os.Args[1]
+	d2 := os.Args[2]
+	res := Inter(d1, d2)
+	os.Stdout.WriteString(res + "\n")
 }
 
 func Inter(str1, str2 string) string {
+	c1 := make(map[rune]bool)
+	c2 := make(map[rune]bool)
 	var res string
-	count := make(map[rune]bool)
-	seen := make(map[rune]bool)
-	for _, val := range str2 {
-		count[val] = true
+	for _, s := range str2{
+		if !c1[s] {
+			c1[s] = true
+		}
 	}
-	for _, val := range str1 {
-		if count[val] && !seen[val] {
-			seen[val] = true
-			res = res+ string(val)
+	for _, s := range str1 {
+		if c1[s] && !c2[s]{
+			c2[s] = true
+			res =res + string(s)
 		}
 	}
 	return res
