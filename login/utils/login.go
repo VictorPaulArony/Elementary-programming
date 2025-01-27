@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"net/http"
 	"text/template"
@@ -13,13 +12,6 @@ import (
 )
 
 var DB *sql.DB
-
-// templates *template.Template
-
-// // Initialize templates (call this function in your main.go or init function)
-// func InitTemplates(templateDir string) {
-// 	templates = template.Must(template.ParseGlob(templateDir + "/*.html"))
-// }
 
 // function to handle the login of the users in the system
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
@@ -73,48 +65,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// function to let the user register in the system
-func RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodGet {
-		RenderTemplates(w, "signup.html", nil)
-		return
-	}
 
-	if r.Method == http.MethodPost {
-		if err := r.ParseForm(); err != nil {
-			ErrorHandler(w, http.StatusBadRequest)
-			return
-		}
-
-		// get the user details from the login form
-		userName := r.FormValue("userName")
-		userEmail := r.FormValue("userEmail")
-		password := r.FormValue("password")
-		confirmPassword := r.FormValue("confirmPassword")
-
-		if password != confirmPassword {
-			http.Error(w, "Password does not match", http.StatusUnauthorized)
-			return
-		}
-
-		// hash the user password
-		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-		if err != nil {
-			http.Error(w, "Error encrypting password", http.StatusInternalServerError)
-			return
-		}
-
-		// generate the uuid for a user
-		userId := uuid.New().String()
-
-		// inserting the user into the user database
-		if _, err = DB.Exec("INSERT INTO users (id, useremail, username, password) VALUES (?, ?, ?, ?)", userId, userEmail, userName, string(hashedPassword)); err != nil {
-			http.Error(w, "Error creating user", http.StatusInternalServerError)
-			return
-		}
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
-	}
-}
 
 // function to render the html templates pages
 func RenderTemplates(w http.ResponseWriter, fileName string, data interface{}) {
