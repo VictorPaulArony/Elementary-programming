@@ -1,16 +1,59 @@
-<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>login</title>
+    <title>Instagram-like Auth</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
 </head>
+
 <body>
-    <form method="POST" action="/login">
-        <input type="text" name="username" placeholder="Username" required />
-        <input type="password" name="password" placeholder="Password" required />
-        <button type="submit">Login</button>
-    </form>
-    
+    <div class="container">
+        <div class="form-container">
+            <div class="logo">
+                <h1 class="logo-text">SMALLY</h1>
+            </div>
+
+            <div id="auth-form">
+                <div class="form-switcher">
+                    <button id="login-toggle" class="active">Log In</button>
+                    <button id="signup-toggle">Sign Up</button>
+                </div>
+
+                <form method="POST" action="/login" id="login-form" class="active">
+                    <input type="text" name="userName" placeholder="UserName" required />
+                    <input type="password" name="password" placeholder="Password" required />
+                    <button type="submit">Log In</button>
+                </form>
+
+                <form method="POST" action="/register" id="signup-form">
+                    <input type="text" name="userName" placeholder="UserName" required />
+                    <input type="email" name="userEmail" placeholder="UserEmail" required />
+                    <input type="password" name="password" placeholder="Password" required />
+                    <input type="password" name="confirmPassword" placeholder="confirmPassword" required />
+                    <button type="submit">Sign Up</button>
+                </form>
+
+        
+            </div>
+        </div>
+    </div>
+     
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="https://github.com/VictorPaulArony/Elementary-programming/tree/main/login">About</a>
+                <a href="https://github.com/VictorPaulArony/Elementary-programming/tree/main/login">Help</a>
+                <a href="https://github.com/VictorPaulArony/Elementary-programming/tree/main/login">Terms</a>
+                <a href="https://github.com/VictorPaulArony/Elementary-programming/tree/main/login">Privacy</a>
+            </div>
+            <div class="footer-copyright">
+                &copy; 2023 Smally Authentication
+            </div>
+        </div>
+    </footer>
+    <script src="/static/script.js"></script>
 </body>
+
 </html>
