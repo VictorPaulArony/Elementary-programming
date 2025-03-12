@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -43,51 +44,67 @@ func ReadingFIle(fileName, targetColumn string) DataSet {
 }
 
 // function to determine if data type is continuous, categorical, or date
-func DetermineDataType(data *DataSet) {
-	for i, header := range data.Headers {
-		if header == data.Target {
+func DetermineDataType(data [][]string, targetColumn int) string {
+	res := ""
+
+	// goroutine for big data sets >10K
+	var wg sync.WaitGroup
+	mu := &sync.Mutex{}
+
+	for i := range data[0] {
+		if i == targetColumn {
 			continue
 		}
 
-		isNumerical := true // numerical until proven to get category data
-		isDate := false     // date
-		isTime := false     // time
-		for _, row := range data.Data {
+		wg.Add(1)
+		go func(i int) {
+			defer wg.Done()
 
-			// Check for missing values
-			if row[i] == "" {
-				isNumerical = false // If there's a missing value, can't be fully numerical
-				continue
+			isNumerical := true // numerical until proven to get category data
+			isDate := false     // date
+			isTime := false     // time
+
+			for _, row := range data {
+				// Check for missing values
+				if row[i] == "" {
+					isNumerical = false // If there's a missing value, can't be fully numerical
+					continue
+				}
+
+				// user parse as float
+				if _, err := strconv.ParseFloat(row[i], 64); err == nil {
+					isNumerical = true
+				} else {
+					isNumerical = false
+				}
+
+				// dtermine date
+				if _, err := time.Parse("2006-01-02", row[i]); err == nil {
+					isDate = true
+				}
+
+				// determine time
+				if _, err := time.Parse(time.RFC3339, row[i]); err == nil {
+					isTime = true
+				}
+
 			}
 
-			// user parse as float
-			if _, err := strconv.ParseFloat(row[i], 64); err == nil {
-				isNumerical = true 
+			// Assign the correct data type
+			mu.Lock()
+			if isNumerical {
+				res = "continuous"
+			} else if isDate {
+				res = "date"
+			} else if isTime {
+				res = "time"
 			} else {
-				isNumerical = false
+				res = "categorical"
 			}
-
-			// dtermine date
-			if _, err := time.Parse("2006-01-02", row[i]); err == nil {
-				isDate = true
-			}
-
-			// determine time
-			if _, err := time.Parse(time.RFC3339, row[i]); err == nil {
-				isTime = true
-			}
-
-		}
-
-		if isNumerical {
-			data.DataType[header] = "continuous"
-		} else if isDate {
-			data.DataType[header] = "date"
-		} else if isTime {
-			data.DataType[header] = "time"
-		} else {
-			data.DataType[header] = "categorical"
-		}
+			mu.Unlock()
+		}(i)
 
 	}
+	wg.Wait() // wait for all goroutin to finish
+	return res
 }
