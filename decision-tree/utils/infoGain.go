@@ -1,37 +1,45 @@
 package utils
 
-// function to calculate the information gain and the gain ratio
-//
-//	Information Gain = Entropy(parent) - (Weighted Average) * Entropy(child)
-func CalculateInfoGain(data *DataSet, targetIndex, targetColumn int) float64 {
-	entropyBeforeSplit := CalcutateEntropy(data, targetIndex)
-	splits := SplitData(data.Data, targetColumn)
+import (
+	"sync"
+)
+
+// function to calculate the information gain
+// information Gain = Entropy(parent) - (Weighted Average) * Entropy(child)
+func CalculateInfoGain(data [][]string, targetIndex, targetColumn int) float64 {
+	entropyBeforeSplit := CalculateEntropy(data, targetIndex)
+
+
+	colType := DetermineDataType(data, targetColumn)
 
 	entropyAfterSplit := 0.0
-	dataRows := len(data.Data)
+	dataRows := len(data)
 
-	for _, subset := range splits {
-		subsetDataSet := &DataSet{
-			Headers: data.Headers,
-			Data:    subset,
+	if colType == "categorical" {
+		splits := SplitDataCategorical(data, targetIndex)
+		// goroutine to calculate the entropy
+		var wg sync.WaitGroup
+		mu := &sync.Mutex{}
+
+		for _, subset := range splits {
+			wg.Add(1)
+			go func(subset [][]string) {
+				defer wg.Done()
+
+				prob := float64(len(subset)) / float64(dataRows)
+				entropyAfterSplit += prob * CalculateEntropy(subset, targetIndex)
+
+				mu.Unlock()
+			}(subset)
 		}
-		prob := float64(len(subset)) / float64(dataRows)
-		entropyAfterSplit += prob * CalcutateEntropy(subsetDataSet, targetIndex)
+		wg.Wait()
+	} else { // calculation for the NUmericals(num,date,time)
+		leftSplit, rightSplit, _ := splitByNumeric(data, targetColumn)
+		total := float64(len(data))
 
+		entropyAfterSplit = (float64(len(leftSplit))/total)*CalculateEntropy(leftSplit, targetIndex) +
+			(float64(len(rightSplit))/total)*CalculateEntropy(rightSplit, targetIndex)
 	}
 
 	return entropyBeforeSplit - entropyAfterSplit
-}
-
-// function to split dataset int subsets based on an column/attributes
-func SplitData(data [][]string, columnIndex int) map[string][][]string {
-	// a map to hold the splits, where the key is the column value,
-	// and the value is a slice of rows that have that column value.
-	splits := make(map[string][][]string)
-
-	for _, row := range data {
-		val := row[columnIndex]
-		splits[val] = append(splits[val], row)
-	}
-	return splits
 }
