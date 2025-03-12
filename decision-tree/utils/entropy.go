@@ -5,16 +5,16 @@ import "math"
 
 // function to salculate the entropy for the dataset
 //  for each class lable calculate probability and entropy
-func CalcutateEntropy(data *DataSet, targetIndex int) float64 {
+func CalculateEntropy(data [][]string, targetIndex int) float64 {
 	var entropy float64
-	dataLen := len(data.Data)
+	dataLen := len(data)
 	if dataLen == 0 {
 		return 0
 	}
 	
 	// Create a map to count occurrences of each class label
 	countLables := make(map[string]int)
-	for _, row := range data.Data {
+	for _, row := range data {
 		countLables[row[targetIndex]]++
 	}
 
