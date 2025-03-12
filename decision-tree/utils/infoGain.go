@@ -9,8 +9,7 @@ func CalculateInfoGain(data *DataSet, targetIndex, targetColumn int) float64 {
 
 	entropyAfterSplit := 0.0
 	dataRows := len(data.Data)
-	// for GR
-	// slpitInfo := 0.0
+
 	for _, subset := range splits {
 		subsetDataSet := &DataSet{
 			Headers: data.Headers,
@@ -19,13 +18,9 @@ func CalculateInfoGain(data *DataSet, targetIndex, targetColumn int) float64 {
 		prob := float64(len(subset)) / float64(dataRows)
 		entropyAfterSplit += prob * CalcutateEntropy(subsetDataSet, targetIndex)
 
-		// for GR
-		// slpitInfo -= prob * math.Log2(prob)
 	}
 
 	return entropyBeforeSplit - entropyAfterSplit
-	// for GR
-	// return (entropyBeforeSplit - entropyAfterSplit) / slpitInfo
 }
 
 // function to split dataset int subsets based on an column/attributes
