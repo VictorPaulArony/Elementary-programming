@@ -39,7 +39,7 @@ func SplitInformation(data [][]string, attrName string, targetName string, heade
 		wg.Wait()
 	} else {
 		// Handle numeric attribute
-		leftSplit, rightSplit, _ := splitByNumeric(data, targetIndex, headers)
+		leftSplit, rightSplit, _ := splitByNumeric(data, targetIndex)
 
 		if len(leftSplit) > 0 {
 			prob := float64(len(leftSplit)) / float64(dataRows)

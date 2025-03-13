@@ -38,7 +38,7 @@ func CalculateInfoGain(data [][]string, attrName string, targetName string, head
 		}
 		wg.Wait()
 	} else { // calculation for the NUmericals(num,date,time)
-		leftSplit, rightSplit, _ := splitByNumeric(data, targetIndex, headers)
+		leftSplit, rightSplit, _ := splitByNumeric(data, targetIndex)
 		total := float64(len(data))
 
 		if len(leftSplit) > 0 {

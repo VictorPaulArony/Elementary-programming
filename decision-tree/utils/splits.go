@@ -21,7 +21,7 @@ func SplitDataCategorical(data [][]string, columnIndex int) map[string][][]strin
 }
 
 // function to split data by numeri, date and time using median
-func splitByNumeric(data [][]string, columnIndex int, headers []string) ([][]string, [][]string, float64) {
+func splitByNumeric(data [][]string, columnIndex int,) ([][]string, [][]string, float64) {
 	values := []float64{}
 	leftSplit, rightSplit := [][]string{}, [][]string{}
 
