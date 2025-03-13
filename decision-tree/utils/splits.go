@@ -12,20 +12,25 @@ func SplitDataCategorical(data [][]string, columnIndex int) map[string][][]strin
 	// and the value is a slice of rows that have that column value.
 	splits := make(map[string][][]string)
 
+	columnIdx := 0
 	for _, row := range data {
-		val := row[columnIndex]
+		val := row[columnIdx]
 		splits[val] = append(splits[val], row)
 	}
 	return splits
 }
 
 // function to split data by numeri, date and time using median
-func splitByNumeric(data [][]string, columnIndex int) ([][]string, [][]string, float64) {
+func splitByNumeric(data [][]string, columnIndex int, headers []string) ([][]string, [][]string, float64) {
 	values := []float64{}
-	// valueToRow := make(map[float64][]string)
 	leftSplit, rightSplit := [][]string{}, [][]string{}
 
+	// Extract numeric values
 	for _, row := range data {
+		if len(row) <= columnIndex {
+			continue
+		}
+
 		num, err := strconv.ParseFloat(row[columnIndex], 64)
 		if err != nil {
 			date, err := time.Parse("2006-01-02", row[columnIndex])
@@ -36,7 +41,6 @@ func splitByNumeric(data [][]string, columnIndex int) ([][]string, [][]string, f
 			num = float64(date.Unix())
 		}
 		values = append(values, num)
-		// valueToRow[num] = row
 	}
 
 	if len(values) == 0 {
@@ -44,7 +48,6 @@ func splitByNumeric(data [][]string, columnIndex int) ([][]string, [][]string, f
 	}
 
 	sort.Float64s(values) // for median computation
-
 	lenValues := len(values)
 	median := 0.0
 
@@ -54,7 +57,11 @@ func splitByNumeric(data [][]string, columnIndex int) ([][]string, [][]string, f
 		median = values[lenValues/2]
 	}
 
+	// Split data based on median
 	for _, row := range data {
+		if len(row) <= columnIndex {
+			continue
+		}
 		num, err := strconv.ParseFloat(row[columnIndex], 64)
 		if err != nil {
 			date, err := time.Parse("2006-01-02", row[columnIndex])
