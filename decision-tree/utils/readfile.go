@@ -17,7 +17,7 @@ type DataSet struct {
 }
 
 // function to read the CSV file
-func ReadingFIle(fileName, targetColumn string) DataSet {
+func ReadingFIle(fileName, targetIndex string) DataSet {
 	file, err := os.Open(fileName)
 	if err != nil {
 		log.Println("Error: Missing input file ", err)
@@ -38,21 +38,22 @@ func ReadingFIle(fileName, targetColumn string) DataSet {
 	return DataSet{
 		Headers:  headings,
 		Data:     data,
-		Target:   targetColumn,
+		Target:   targetIndex,
 		DataType: make(map[string]string),
 	}
 }
 
 // function to determine if data type is continuous, categorical, or date
-func DetermineDataType(data [][]string, targetColumn int) string {
+func DetermineDataType(data [][]string, headers []string) string {
 	res := ""
 
 	// goroutine for big data sets >10K
 	var wg sync.WaitGroup
 	mu := &sync.Mutex{}
 
-	for i := range data[0] {
-		if i == targetColumn {
+	targetIdx := -1
+	for i := range headers {
+		if i == targetIdx {
 			continue
 		}
 
