@@ -1,9 +1,9 @@
 package utils
 
 // function to compute the gain ratio for the C4.5 to determine the attribute values
-func GainRatio(data [][]string, targetIndex, targetColumn int) float64 {
-	infoGain := CalculateInfoGain(data, targetIndex, targetColumn)
-	infoSplit := SplitInformation(data, targetIndex)
+func GainRatio(data [][]string,attrName string, targetName string, headers []string) float64 {
+	infoGain := CalculateInfoGain(data, attrName, targetName, headers)
+	infoSplit := SplitInformation(data, attrName, targetName, headers)
 
 	if infoSplit == 0 {
 		return 0.0
@@ -12,12 +12,12 @@ func GainRatio(data [][]string, targetIndex, targetColumn int) float64 {
 }
 
 // to find the best lable/ class to split from
-func BestLable(data [][]string, targetIndex int, lables []int) (int, float64) {
-	bestLable := -1
+func BestLable(data [][]string, attributes []string, targetName string, headers []string) (string, float64) {
+	bestLable := ""
 	bestScore := -1.0
 
-	for _, lablecolumn := range lables {
-		score := GainRatio(data, targetIndex, lablecolumn)
+	for _, lablecolumn := range headers {
+		score := GainRatio(data, lablecolumn, targetName, headers)
 		if score > bestScore {
 			bestScore = score
 			bestLable = lablecolumn
