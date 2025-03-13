@@ -9,10 +9,10 @@ func CalculateEntropy(data [][]string, targetIndex int) float64 {
 	var entropy float64
 	dataLen := len(data)
 	if dataLen == 0 {
-		return 0
+		return 0.0
 	}
 	
-	// Create a map to count occurrences of each class label
+	//a map to count occurrences of each class label
 	countLables := make(map[string]int)
 	for _, row := range data {
 		countLables[row[targetIndex]]++
