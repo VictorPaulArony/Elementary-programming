@@ -6,14 +6,16 @@ import (
 
 // function to calculate the information gain
 // information Gain = Entropy(parent) - (Weighted Average) * Entropy(child)
-func CalculateInfoGain(data [][]string, targetIndex, targetColumn int) float64 {
-	entropyBeforeSplit := CalculateEntropy(data, targetIndex)
+func CalculateInfoGain(data [][]string, attrName string, targetName string, headers []string) float64 {
+	entropyBeforeSplit := CalculateEntropy(data, targetName, headers)
+	targetIndex := findColumnIndex(headers, targetName)
 	dataRows := len(data)
+
 	if dataRows == 0 {
 		return 0.0
 	}
 
-	colType := DetermineDataType(data, targetColumn)
+	colType := DetermineDataType(data, headers)
 
 	entropyAfterSplit := 0.0
 
@@ -27,28 +29,25 @@ func CalculateInfoGain(data [][]string, targetIndex, targetColumn int) float64 {
 			wg.Add(1)
 			go func(subset [][]string) {
 				defer wg.Done()
-
+				mu.Lock()
 				prob := float64(len(subset)) / float64(dataRows)
-				entropyAfterSplit += prob * CalculateEntropy(subset, targetIndex)
+				entropyAfterSplit += prob * CalculateEntropy(subset, targetName, headers)
 
 				mu.Unlock()
 			}(subset)
 		}
 		wg.Wait()
 	} else { // calculation for the NUmericals(num,date,time)
-		leftSplit, rightSplit, _ := splitByNumeric(data, targetColumn)
+		leftSplit, rightSplit, _ := splitByNumeric(data, targetIndex, headers)
 		total := float64(len(data))
 
 		if len(leftSplit) > 0 {
-			entropyAfterSplit += (float64(len(leftSplit)) / total) * CalculateEntropy(leftSplit, targetIndex)
+			entropyAfterSplit += (float64(len(leftSplit)) / total) * CalculateEntropy(leftSplit, targetName, headers)
 		}
 		if len(rightSplit) > 0 {
-			entropyAfterSplit += (float64(len(rightSplit)) / total) * CalculateEntropy(rightSplit, targetIndex)
+			entropyAfterSplit += (float64(len(rightSplit)) / total) * CalculateEntropy(rightSplit, targetName, headers)
 		}
 
-		// entropyAfterSplit = (float64(len(leftSplit))/total)*CalculateEntropy(leftSplit, targetIndex) +
-		// 	(float64(len(rightSplit))/total)*CalculateEntropy(rightSplit, targetIndex)
 	}
-
 	return entropyBeforeSplit - entropyAfterSplit
 }
