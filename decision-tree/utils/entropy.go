@@ -7,20 +7,18 @@ import (
 // function to salculate the entropy for the dataset
 //
 //	for each class lable calculate probability and entropy
-func CalculateEntropy(data [][]string, targetName string, headers []string) float64 {
-	targetIndex := FindColumnIndex(headers, targetName)
+func CalculateEntropy(data [][]string, targetIndex int) float64 {
 	countLables := make(map[string]int)
-
 	for _, row := range data {
-		countLables[row[targetIndex]]++
+		if len(row) > targetIndex { // Add bounds check
+			countLables[row[targetIndex]]++
+		}
 	}
-
 	var entropy float64
 	dataLen := len(data)
 	if dataLen == 0 {
 		return 0.0 // division by 0 in prob
 	}
-
 	// Calculate the entropy based on the class label counts
 	for _, count := range countLables {
 		prob := float64(count) / float64(dataLen)
@@ -28,7 +26,6 @@ func CalculateEntropy(data [][]string, targetName string, headers []string) floa
 		if prob > 0 { // Avoid log2(0) which is undefined
 			entropy -= prob * math.Log2(prob)
 		}
-
 	}
 	// fmt.Println(entropy)
 	return entropy
