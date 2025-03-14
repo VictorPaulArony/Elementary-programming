@@ -1,9 +1,11 @@
 package utils
 
+import "sync"
+
 // function to compute the gain ratio for the C4.5 to determine the attribute values
-func GainRatio(data [][]string, attrName string, targetName string, headers []string) float64 {
-	infoGain := CalculateInfoGain(data, attrName, targetName, headers)
-	infoSplit := SplitInformation(data, attrIndex)
+func GainRatio(data [][]string, columnIndex int, targetIndex int) float64 {
+	infoGain := CalculateInfoGain(data, columnIndex, targetIndex)
+	infoSplit := SplitInformation(data, columnIndex)
 	if infoSplit == 0 {
 		return 0.0
 	}
@@ -12,54 +14,83 @@ func GainRatio(data [][]string, attrName string, targetName string, headers []st
 }
 
 // to find the best lable/ class to split from
-func BestLable(data [][]string, attributes []string, targetName string, headers []string) (int, float64) {
+func ParallelBestLable(data [][]string, attributes []string, targetName string, headers []string) (int, float64) {
 	targetIndex := FindColumnIndex(headers, targetName)
-	bestLable := -1
-	bestScore := 0.0
-
-	for lableINdex := range headers {
-		if lableINdex == targetIndex {
-			continue
-		}
-		score := GainRatio(data, targetName, targetName, headers)
-		if score > bestScore {
-			bestScore = score
-			bestLable = lableINdex
-		}
+	if targetIndex == -1 {
+		return -1, 0.0
 	}
-	
-	return bestLable, bestScore
+
+	// Use a mutex to protect access to shared variables
+	var mu sync.Mutex
+	var wg sync.WaitGroup
+
+	bestScore := 0.0
+	bestAttrIndex := -1
+
+	// Process attributes in parallel
+	for _, attr := range attributes {
+		wg.Add(1)
+		go func(attribute string) {
+			defer wg.Done()
+
+			attrIndex := FindColumnIndex(headers, attribute)
+			if attrIndex == -1 {
+				return
+			}
+
+			// Calculate gain ratio for this attribute
+			score := GainRatio(data, attrIndex, targetIndex)
+
+			// Update best score if this is better
+			mu.Lock()
+			if score > bestScore {
+				bestScore = score
+				bestAttrIndex = attrIndex
+			}
+			mu.Unlock()
+		}(attr)
+	}
+
+	// Wait for all goroutines to complete
+	wg.Wait()
+
+	return bestAttrIndex, bestScore
 }
 
 // function to determine the most common class lable
 func CommonClassLable(data [][]string, targetName string, headers []string) string {
 	targetIndex := FindColumnIndex(headers, targetName)
-	classCount := make(map[string]int)
-	mostClass := ""
-	maxCount := 0
-
-	for _, row := range data {
-		classCount[row[targetIndex]]++
+	if targetIndex == -1 {
+		return ""
 	}
 
-	for class, count := range classCount {
-		if count > maxCount {
-			maxCount = count
-			mostClass = class
+	classCounts := make(map[string]int)
+	for _, row := range data {
+		if len(row) > targetIndex {
+			classCounts[row[targetIndex]]++
 		}
 	}
-	return mostClass
+
+	maxCount := 0
+	maxClass := ""
+	for class, count := range classCounts {
+		if count > maxCount {
+			maxCount = count
+			maxClass = class
+		}
+	}
+
+	return maxClass
 }
 
 // function to check if all the samples belong to the same calss
 func CheckPureClass(data [][]string, targetName string, headers []string) (string, bool) {
-	if len(data) == 0 {
-		return "", true
+	targetIndex := FindColumnIndex(headers, targetName)
+	if len(data) == 0 || targetIndex == -1 {
+		return "", false
 	}
 
-	targetIndex := FindColumnIndex(headers, targetName)
 	firstClass := data[0][targetIndex]
-
 	for _, row := range data {
 		if row[targetIndex] != firstClass {
 			return "", false
