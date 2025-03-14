@@ -7,8 +7,8 @@ import (
 
 // function to calculate the split infomation
 // measure how uniformly the data is (prevent bias)
-func SplitInformation(data [][]string, attrName string, targetName string, headers []string) float64 {
-	targetIndex:= findColumnIndex(headers, attrName)
+func SplitInformation(data [][]string, targetIndex int) float64 {
+	// targetIndex := FindColumnIndex(headers, attrName)
 	dataRows := len(data)
 	if dataRows == 0 {
 		return 0.0 // prevent division by 0
@@ -18,7 +18,7 @@ func SplitInformation(data [][]string, attrName string, targetName string, heade
 	colType := DetermineDataType(data, headers)
 
 	if colType == "categorical" {
-		splits := SplitDataCategorical(data, targetIndex)
+		splits := splitDataCategoricalSequential(data, targetIndex)
 		// goroutine to calculate the entropy
 		var wg sync.WaitGroup
 		mu := &sync.Mutex{}
@@ -32,6 +32,7 @@ func SplitInformation(data [][]string, attrName string, targetName string, heade
 				if prob > 0 {
 					mu.Lock()
 					splitInfo -= prob * math.Log2(prob)
+
 					mu.Unlock()
 				}
 			}(subset)
@@ -39,7 +40,7 @@ func SplitInformation(data [][]string, attrName string, targetName string, heade
 		wg.Wait()
 	} else {
 		// Handle numeric attribute
-		leftSplit, rightSplit, _ := splitByNumeric(data, targetIndex)
+		leftSplit, rightSplit, _ := SplitByNumericParallel(data, targetIndex)
 
 		if len(leftSplit) > 0 {
 			prob := float64(len(leftSplit)) / float64(dataRows)
@@ -53,7 +54,9 @@ func SplitInformation(data [][]string, attrName string, targetName string, heade
 				splitInfo -= prob * math.Log2(prob)
 			}
 		}
+		// fmt.Println(leftSplit)
+		// fmt.Println(rightSplit)
 	}
-
+	// fmt.Println(splitInfo)
 	return splitInfo
 }
