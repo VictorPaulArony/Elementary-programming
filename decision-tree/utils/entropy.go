@@ -8,8 +8,9 @@ import (
 //
 //	for each class lable calculate probability and entropy
 func CalculateEntropy(data [][]string, targetName string, headers []string) float64 {
-	targetIndex := findColumnIndex(headers, targetName)
+	targetIndex := FindColumnIndex(headers, targetName)
 	countLables := make(map[string]int)
+
 	for _, row := range data {
 		countLables[row[targetIndex]]++
 	}
@@ -24,14 +25,17 @@ func CalculateEntropy(data [][]string, targetName string, headers []string) floa
 	for _, count := range countLables {
 		prob := float64(count) / float64(dataLen)
 		// Update the entropy using the formula: -p * log2(p)
-		entropy -= prob * math.Log2(prob)
+		if prob > 0 { // Avoid log2(0) which is undefined
+			entropy -= prob * math.Log2(prob)
+		}
 
 	}
+	// fmt.Println(entropy)
 	return entropy
 }
 
 // Functin to find the index of a column by its name
-func findColumnIndex(headers []string, columnName string) int {
+func FindColumnIndex(headers []string, columnName string) int {
 	for i, header := range headers {
 		if header == columnName {
 			return i
