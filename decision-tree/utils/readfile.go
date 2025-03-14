@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"strconv"
-	"sync"
 	"time"
 )
 
@@ -44,68 +43,29 @@ func ReadingFIle(fileName, targetIndex string) DataSet {
 }
 
 // function to determine if data type is continuous, categorical, or date
-func DetermineDataType(data [][]string, headers []string) string {
-	res := ""
+func DetermineDataType(data [][]string, columnIndex int) string {
+	if len(data) == 0 {
+		return "categorical" // Default to categorical for empty data
+	}
 
-	// goroutine for big data sets >10K
-	var wg sync.WaitGroup
-	mu := &sync.Mutex{}
-
-	targetIdx := -1
-	for i := range headers {
-		if i == targetIdx {
+	// Check if the column contains numerical values
+	for _, row := range data {
+		if len(row) <= columnIndex {
 			continue
 		}
 
-		wg.Add(1)
-		go func(i int) {
-			defer wg.Done()
+		// Try to parse as float
+		_, err := strconv.ParseFloat(row[columnIndex], 64)
+		if err == nil {
+			return "continuous"
+		}
 
-			isNumerical := true // numerical until proven to get category data
-			isDate := false     // date
-			isTime := false     // time
-
-			for _, row := range data {
-				// Check for missing values
-				if row[i] == "" {
-					isNumerical = false // If there's a missing value, can't be fully numerical
-					continue
-				}
-
-				// user parse as float
-				if _, err := strconv.ParseFloat(row[i], 64); err == nil {
-					isNumerical = true
-				} else {
-					isNumerical = false
-				}
-
-				// dtermine date
-				if _, err := time.Parse("2006-01-02", row[i]); err == nil {
-					isDate = true
-				}
-
-				// determine time
-				if _, err := time.Parse(time.RFC3339, row[i]); err == nil {
-					isTime = true
-				}
-
-			}
-
-			// Assign the correct data type
-			mu.Lock()
-			if isNumerical {
-				res = "continuous"
-			} else if isDate {
-				res = "date"
-			} else if isTime {
-				res = "time"
-			} else {
-				res = "categorical"
-			}
-			mu.Unlock()
-		}(i)
-
+		// Try to parse as date
+		_, err = time.Parse("2006-01-02", row[columnIndex])
+		if err == nil {
+			return "continuous"
+		}
 	}
-	wg.Wait() // wait for all goroutin to finish
-	return res
+
+	return "categorical"
 }
