@@ -7,8 +7,9 @@ import (
 // function to calculate the information gain
 // information Gain = Entropy(parent) - (Weighted Average) * Entropy(child)
 func CalculateInfoGain(data [][]string, attrName string, targetName string, headers []string) float64 {
+	// targetIndex := findColumnIndex(data.Headers, data.Target)
 	entropyBeforeSplit := CalculateEntropy(data, targetName, headers)
-	targetIndex := findColumnIndex(headers, targetName)
+	targetIndex := FindColumnIndex(headers, targetName)
 	dataRows := len(data)
 
 	if dataRows == 0 {
@@ -20,12 +21,14 @@ func CalculateInfoGain(data [][]string, attrName string, targetName string, head
 	entropyAfterSplit := 0.0
 
 	if colType == "categorical" {
-		splits := SplitDataCategorical(data, targetIndex)
+		splits := splitDataCategoricalSequential(data, targetIndex)
+
 		// goroutine to calculate the entropy
 		var wg sync.WaitGroup
 		mu := &sync.Mutex{}
 
 		for _, subset := range splits {
+
 			wg.Add(1)
 			go func(subset [][]string) {
 				defer wg.Done()
@@ -38,7 +41,8 @@ func CalculateInfoGain(data [][]string, attrName string, targetName string, head
 		}
 		wg.Wait()
 	} else { // calculation for the NUmericals(num,date,time)
-		leftSplit, rightSplit, _ := splitByNumeric(data, targetIndex)
+		leftSplit, rightSplit, _ := SequentialSplitByNumeric(data, targetIndex)
+		// fmt.Println(leftSplit, " , ", rightSplit)
 		total := float64(len(data))
 
 		if len(leftSplit) > 0 {
@@ -49,5 +53,6 @@ func CalculateInfoGain(data [][]string, attrName string, targetName string, head
 		}
 
 	}
+	// println(entropyBeforeSplit, entropyAfterSplit)
 	return entropyBeforeSplit - entropyAfterSplit
 }
