@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"sort"
 	"strconv"
 	"sync"
@@ -21,6 +20,66 @@ func splitDataCategoricalSequential(data [][]string, columnIndex int) map[string
 			splits[val] = append(splits[val], row)
 		}
 	}
+	return splits
+}
+
+// Function to split categorical data using goroutines
+func splitDataCategoricalParallel(data [][]string, columnIndex int) map[string][][]string {
+	// A concurrent-safe map to hold the splits
+	splits := make(map[string][][]string)
+	
+	// Mutex to ensure safe concurrent writes to the map
+	var mu sync.Mutex
+	var wg sync.WaitGroup
+
+	// Using a map to track unique values and a buffered channel to process splits
+	uniqueValues := make(map[string]bool)
+
+	// Identify unique values in the column
+	for _, row := range data {
+		if len(row) > columnIndex {
+			uniqueValues[row[columnIndex]] = true
+		}
+	}
+
+	// Channel to collect split data
+	resultChan := make(chan struct {
+		key  string
+		rows [][]string
+	}, len(uniqueValues))
+
+	// Launch a goroutine for each unique value
+	for value := range uniqueValues {
+		wg.Add(1)
+		go func(val string) {
+			defer wg.Done()
+			subset := [][]string{}
+			for _, row := range data {
+				if len(row) > columnIndex && row[columnIndex] == val {
+					subset = append(subset, row)
+				}
+			}
+			// Send result to channel
+			resultChan <- struct {
+				key  string
+				rows [][]string
+			}{key: val, rows: subset}
+		}(value)
+	}
+
+	// Close channel when all goroutines finish
+	go func() {
+		wg.Wait()
+		close(resultChan)
+	}()
+
+	// Collect results safely
+	for result := range resultChan {
+		mu.Lock()
+		splits[result.key] = result.rows
+		mu.Unlock()
+	}
+
 	return splits
 }
 
@@ -46,7 +105,6 @@ func SequentialSplitByNumeric(data [][]string, columnIndex int) ([][]string, [][
 	if len(values) == 0 {
 		return data, [][]string{}, 0.0 // return original data if no valid values
 	}
-
 
 	sort.Float64s(values) // for median computation
 	lenValues := len(values)
@@ -80,7 +138,7 @@ func SequentialSplitByNumeric(data [][]string, columnIndex int) ([][]string, [][
 		}
 	}
 
-	fmt.Println(leftSplit, " , ", rightSplit)
+	// fmt.Println(leftSplit, " , ", rightSplit)
 	return leftSplit, rightSplit, median
 }
 
