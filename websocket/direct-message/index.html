@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head><title>Direct Messaging</title></head>
+<body>
+  <h2>One-to-One Chat</h2>
+
+  <p>From (Your ID): <input id="fromId" /></p>
+  <p>To (Recipient ID): <input id="toId" /></p>
+  <p>Message: <input id="msg" /></p>
+  <button onclick="sendMessage()">Send</button>
+
+  <div id="chat"></div>
+
+  <script>
+    let socket;
+
+    document.getElementById("fromId").addEventListener("blur", () => {
+      const id = document.getElementById("fromId").value;
+      socket = new WebSocket(`ws://localhost:1234/ws?id=${id}`);
+
+      socket.onmessage = function (e) {
+        const chat = document.getElementById("chat");
+        const data = JSON.parse(e.data);
+        chat.innerHTML += `<p><b>${data.from}:</b> ${data.message}</p>`;
+      };
+    });
+
+    function sendMessage() {
+      const msg = {
+        from: document.getElementById("fromId").value,
+        to: document.getElementById("toId").value,
+        message: document.getElementById("msg").value,
+      };
+      socket.send(JSON.stringify(msg));
+    }
+  </script>
+</body>
+</html>
