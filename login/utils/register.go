@@ -73,6 +73,7 @@ func RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// hash the user password
+		
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 		if err != nil {
 			http.Error(w, "Error encrypting password", http.StatusInternalServerError)
@@ -94,7 +95,7 @@ func RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Error creating user", http.StatusInternalServerError)
 			return
 		}
-		
+
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 	}
 }
