@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket DM Example</title>
+    <script>
+        let ws;
+
+        function connect() {
+            const username = document.getElementById('username').value;
+            if (!username) {
+                alert('Please enter a username');
+                return;
+            }
+
+            ws = new WebSocket(`ws://localhost:8080/ws?username=${username}`);
+
+            ws.onopen = function() {
+                document.getElementById('status').textContent = 'Connected';
+                document.getElementById('connectBtn').disabled = true;
+                document.getElementById('disconnectBtn').disabled = false;
+                document.getElementById('sendBtn').disabled = false;
+            };
+
+            ws.onmessage = function(event) {
+                const messages = document.getElementById('messages');
+                const message = document.createElement('div');
+                message.textContent = event.data;
+                messages.appendChild(message);
+            };
+
+            ws.onclose = function() {
+                document.getElementById('status').textContent = 'Disconnected';
+                document.getElementById('connectBtn').disabled = false;
+                document.getElementById('disconnectBtn').disabled = true;
+                document.getElementById('sendBtn').disabled = true;
+            };
+        }
+
+        function disconnect() {
+            if (ws) {
+                ws.close();
+            }
+        }
+
+        function sendMessage() {
+            const recipient = document.getElementById('recipient').value;
+            const message = document.getElementById('message').value;
+
+            if (!recipient || !message) {
+                alert('Please enter both recipient and message');
+                return;
+            }
+
+            const msg = {
+                recipient: recipient,
+                content: message
+            };
+
+            ws.send(JSON.stringify(msg));
+            document.getElementById('message').value = '';
+        }
+    </script>
+</head>
+<body>
+    <h1>WebSocket DM Example</h1>
+    
+    <div>
+        <input type="text" id="username" placeholder="Your username">
+        <button id="connectBtn" onclick="connect()">Connect</button>
+        <button id="disconnectBtn" onclick="disconnect()" disabled>Disconnect</button>
+    </div>
+    
+    <div>
+        Status: <span id="status">Disconnected</span>
+    </div>
+    
+    <hr>
+    
+    <div>
+        <input type="text" id="recipient" placeholder="Recipient username">
+        <input type="text" id="message" placeholder="Your message">
+        <button id="sendBtn" onclick="sendMessage()" disabled>Send</button>
+    </div>
+    
+    <hr>
+    
+    <h2>Messages</h2>
+    <div id="messages" style="height: 300px; overflow-y: scroll; border: 1px solid #ccc;"></div>
+</body>
+</html>
